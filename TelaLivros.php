@@ -1,13 +1,9 @@
 <?php
 
 if (isset( $_GET['busca'] ) ) {
-
-    $pesquisa = $_GET['busca'];
-
+  $pesquisa = $_GET['busca'];
 } else {
-
-   $pesquisa = '';
-
+  $pesquisa = '';
 }
 
 include_once('conexao.php');
@@ -15,13 +11,13 @@ include_once('conexao.php');
 $sql = "SELECT *  FROM livro 
                 WHERE titulo LIKE '%$pesquisa%' 
                 OR autor LIKE '%$pesquisa%'
-                OR categoria LIKE '%$pesquisa%'
                 OR quantidade LIKE
                   '%$pesquisa%' ";
+                  
+$sqlCategoriaRomance = "SELECT *  FROM livro WHERE categoria = 'Romance'";
 
 $dados = mysqli_query($mysqli, $sql);
-
-
+$dadosSelectRomance = mysqli_query($mysqli, $sqlCategoriaRomance);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -43,24 +39,53 @@ $dados = mysqli_query($mysqli, $sql);
       <div class="div-verde"></div>
       <div class="div-amarelo"></div>
       
-      <form class="div-search" action="">
+      <form class="div-search" action="" method="GET">
       <input name="busca" class="input-search" type="search" placeholder="Pesquisar ex: Livro..." />
       <button type="submit" class="btn-search"><i class="fa fa-search"></i></button>
+      
+      <select name="menuCategorias" id="categorias">
+        <option value="Todos">Todos</option>
+        <option value="Romance">Romance</option>
+        <option value="Aventura">Aventura</option>
+      </select>
       </form>
- 
+      
       
     <h1 class="categoria-title">Livros</h1>
     
     <div class="livros-list">
      <!-- Os Livros aparecem dentro da livros-list -->
- 
+      
       <?php
-
+        $categorias = $_GET['menuCategorias'];
+         if ($categorias === 'Todos') {
+         
           while ($livro = mysqli_fetch_assoc($dados) ) {
           $livroTitulo = $livro['titulo'];
           $livroAutor = $livro['autor'];
-          $livroCategoria = $livro['categoria'];
           $livroQuantidade = $livro['quantidade'];
+        ?>
+        
+        <div class='container-livro'>
+          <div class='livro'>
+          <p class='livro-titulo'><?php echo $livroTitulo ?></p>
+          <p class='livro-autor'><?php echo $livroAutor ?></p>
+          </div>
+          <div class='span'>
+          <p class='disponivel'>Disponível</p>
+          <p class='livro-quantidade'><?php echo $livroQuantidade ?></p>
+          </div>
+          </div>
+          
+        <?php
+        }}
+          $categorias = $_GET['menuCategorias'];
+          if ($categorias === 'Romance') {
+          while ($livrosRomance = mysqli_fetch_assoc($dadosSelectRomance) ) {
+            
+            $livroTitulo = $livrosRomance['titulo'];
+            $livroAutor = $livrosRomance['autor'];
+            $livroQuantidade = $livrosRomance['quantidade'];
           ?>
           <div class='container-livro'>
           <div class='livro'>
@@ -72,12 +97,12 @@ $dados = mysqli_query($mysqli, $sql);
           <p class='livro-quantidade'><?php echo $livroQuantidade ?></p>
           </div>
           </div>
-         
-          <?php
-          }
-          
-      ?>
+        <?php
+        }}
+        ?>
       
+          
+     
     </div>
     
     <div class="footer">
